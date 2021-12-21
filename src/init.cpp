@@ -1,14 +1,5 @@
 #include "init.hh"
 
-#define TEST_OPENGL_ERROR()                                                             \
-    do {		  							\
-        GLenum err = glGetError(); 					                        \
-        if (err != GL_NO_ERROR) std::cerr << "OpenGL ERROR! " << __LINE__ << std::endl;      \
-    } while(0)
-
-GLuint vao_id;
-GLuint program_id;
-
 void window_resize(int width, int height)
 {
     glViewport(0,0,width, height);
@@ -20,7 +11,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     TEST_OPENGL_ERROR();
 
-    glBindVertexArray(vao_id);
+    glBindVertexArray(bunny_vao_id);
     TEST_OPENGL_ERROR();
 
     glDrawArrays(GL_TRIANGLES, 0, vertex_buffer_data.size());
@@ -30,6 +21,8 @@ void display()
     TEST_OPENGL_ERROR();
 
     glutSwapBuffers();
+
+    //glutPostRedisplay();
 }
 
 void init_glut(int &argc, char *argv[])
@@ -64,42 +57,8 @@ void init_GL() {
     glEnable(GL_CULL_FACE);
     TEST_OPENGL_ERROR();
 
-    glClearColor(0.4,0.4,0.4,1.0);
+    glClearColor(0,0.4,0.5,1.0);
     TEST_OPENGL_ERROR();
-}
-
-/*
-void init_object_vbo() {
-    int max_nb_vbo = 5;
-    int nb_vbo = 0;
-    int index_vbo = 0;
-    GLuint vbo_ids[max_nb_vbo];
-
-    GLint vertex_location = glGetAttribLocation(program_id,"position");TEST_OPENGL_ERROR();
-    GLint normal_smooth_location = glGetAttribLocation(program_id,"normalSmooth");TEST_OPENGL_ERROR();
-
-    glGenVertexArrays(1, &bunny_vao_id);TEST_OPENGL_ERROR();
-    glBindVertexArray(bunny_vao_id);TEST_OPENGL_ERROR();
-
-    if (vertex_location!=-1) nb_vbo++;
-    if (normal_smooth_location!=-1) nb_vbo++;
-    glGenBuffers(nb_vbo, vbo_ids);TEST_OPENGL_ERROR();
-
-    if (vertex_location!=-1) {
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[index_vbo++]);TEST_OPENGL_ERROR();
-        glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size()*sizeof(float), vertex_buffer_data.data(), GL_STATIC_DRAW);TEST_OPENGL_ERROR();
-        glVertexAttribPointer(vertex_location, 3, GL_FLOAT, GL_FALSE, 0, 0);TEST_OPENGL_ERROR();
-        glEnableVertexAttribArray(vertex_location);TEST_OPENGL_ERROR();
-    }
-
-    if (normal_smooth_location!=-1) {
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[index_vbo++]);TEST_OPENGL_ERROR();
-        glBufferData(GL_ARRAY_BUFFER, normal_smooth_buffer_data.size()*sizeof(float), normal_smooth_buffer_data.data(), GL_STATIC_DRAW);TEST_OPENGL_ERROR();
-        glVertexAttribPointer(normal_smooth_location, 3, GL_FLOAT, GL_FALSE, 0, 0);TEST_OPENGL_ERROR();
-        glEnableVertexAttribArray(normal_smooth_location);TEST_OPENGL_ERROR();
-    }
-
-    glBindVertexArray(0);
 }
 
 
@@ -120,23 +79,35 @@ std::string load(const std::string &filename) {
 }
 
 bool init_shaders() {
-    std::string vertex_src = load("vertex.shd");
-    std::string fragment_src = load("fragment.shd");
+    std::string vertex_src = load("../vertex.shd");
+    std::string fragment_src = load("../fragment.shd");
+
+
     GLuint shader_id[2];
     GLint compile_status = GL_TRUE;
+
     char *vertex_shd_src = (char*)std::malloc(vertex_src.length()*sizeof(char));
     char *fragment_shd_src = (char*)std::malloc(fragment_src.length()*sizeof(char));
     vertex_src.copy(vertex_shd_src,vertex_src.length());
     fragment_src.copy(fragment_shd_src,fragment_src.length());
 
 
-    shader_id[0] = glCreateShader(GL_VERTEX_SHADER);TEST_OPENGL_ERROR();
-    shader_id[1] = glCreateShader(GL_FRAGMENT_SHADER);TEST_OPENGL_ERROR();
+    shader_id[0] = glCreateShader(GL_VERTEX_SHADER);
+    TEST_OPENGL_ERROR();
 
-    glShaderSource(shader_id[0], 1, (const GLchar**)&(vertex_shd_src), 0);TEST_OPENGL_ERROR();
-    glShaderSource(shader_id[1], 1, (const GLchar**)&(fragment_shd_src), 0);TEST_OPENGL_ERROR();
+    shader_id[1] = glCreateShader(GL_FRAGMENT_SHADER);
+    TEST_OPENGL_ERROR();
+
+    glShaderSource(shader_id[0], 1, (const GLchar**)&(vertex_shd_src), 0);
+    TEST_OPENGL_ERROR();
+
+    glShaderSource(shader_id[1], 1, (const GLchar**)&(fragment_shd_src), 0);
+    TEST_OPENGL_ERROR();
+
     for(int i = 0 ; i < 2 ; i++) {
-        glCompileShader(shader_id[i]);TEST_OPENGL_ERROR();
+        glCompileShader(shader_id[i]);
+        TEST_OPENGL_ERROR();
+
         glGetShaderiv(shader_id[i], GL_COMPILE_STATUS, &compile_status);
         if(compile_status != GL_TRUE) {
             GLint log_size;
@@ -160,12 +131,19 @@ bool init_shaders() {
 
 
     GLint link_status=GL_TRUE;
-    program_id=glCreateProgram();TEST_OPENGL_ERROR();
-    if (program_id==0) return false;
+    program_id=glCreateProgram();
+    TEST_OPENGL_ERROR();
+
+    if (program_id==0)
+        return false;
+
     for(int i = 0 ; i < 2 ; i++) {
-        glAttachShader(program_id, shader_id[i]);TEST_OPENGL_ERROR();
+        glAttachShader(program_id, shader_id[i]);
+        TEST_OPENGL_ERROR();
     }
-    glLinkProgram(program_id);TEST_OPENGL_ERROR();
+    glLinkProgram(program_id);
+    TEST_OPENGL_ERROR();
+
     glGetProgramiv(program_id, GL_LINK_STATUS, &link_status);
     if (link_status!=GL_TRUE) {
         GLint log_size;
@@ -177,14 +155,79 @@ bool init_shaders() {
             std::cerr << "Program " << program_log << std::endl;
             std::free(program_log);
         }
-        glDeleteProgram(program_id);TEST_OPENGL_ERROR();
-        glDeleteShader(shader_id[0]);TEST_OPENGL_ERROR();
-        glDeleteShader(shader_id[1]);TEST_OPENGL_ERROR();
+        glDeleteProgram(program_id);
+        TEST_OPENGL_ERROR();
+
+        glDeleteShader(shader_id[0]);
+        TEST_OPENGL_ERROR();
+
+        glDeleteShader(shader_id[1]);
+        TEST_OPENGL_ERROR();
         program_id=0;
         return false;
     }
-    glUseProgram(program_id);TEST_OPENGL_ERROR();
+    glUseProgram(program_id);
+    TEST_OPENGL_ERROR();
+
     return true;
 }
 
-*/
+void init_object_vbo() {
+    int max_nb_vbo = 5;
+    int nb_vbo = 0;
+    int index_vbo = 0;
+    GLuint vbo_ids[max_nb_vbo];
+
+    std::cout << program_id << std::endl;
+    GLint vertex_location = glGetAttribLocation(program_id,"position");
+    TEST_OPENGL_ERROR();
+    std::cout << program_id << std::endl;
+
+    GLint normal_smooth_location = glGetAttribLocation(program_id,"normalSmooth");
+    TEST_OPENGL_ERROR();
+
+    glGenVertexArrays(1, &bunny_vao_id);
+    TEST_OPENGL_ERROR();
+
+    glBindVertexArray(bunny_vao_id);
+    TEST_OPENGL_ERROR();
+
+    if (vertex_location!=-1)
+        nb_vbo++;
+    if (normal_smooth_location!=-1)
+        nb_vbo++;
+
+    glGenBuffers(nb_vbo, vbo_ids);
+    TEST_OPENGL_ERROR();
+
+    if (vertex_location!=-1) {
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[index_vbo++]);
+        TEST_OPENGL_ERROR();
+
+        glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size()*sizeof(float), vertex_buffer_data.data(), GL_STATIC_DRAW);
+        TEST_OPENGL_ERROR();
+
+        glVertexAttribPointer(vertex_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        TEST_OPENGL_ERROR();
+
+        glEnableVertexAttribArray(vertex_location);
+        TEST_OPENGL_ERROR();
+    }
+
+    if (normal_smooth_location!=-1) {
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[index_vbo++]);
+        TEST_OPENGL_ERROR();
+
+        glBufferData(GL_ARRAY_BUFFER, normal_smooth_buffer_data.size()*sizeof(float), normal_smooth_buffer_data.data(), GL_STATIC_DRAW);
+        TEST_OPENGL_ERROR();
+
+        glVertexAttribPointer(normal_smooth_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        TEST_OPENGL_ERROR();
+
+        glEnableVertexAttribArray(normal_smooth_location);
+        TEST_OPENGL_ERROR();
+    }
+
+    glBindVertexArray(0);
+}
+

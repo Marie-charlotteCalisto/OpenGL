@@ -6,7 +6,8 @@ int main(int argc, char *argv[])
     if (!init_glew())
         std::exit(-1);
     init_GL();
-   // init_shaders();
-   // init_object_vbo();
+    init_shaders();
+    init_object_vbo();
+
     glutMainLoop();
 }
