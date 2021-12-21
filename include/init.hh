@@ -8,3 +8,7 @@
 static const std::vector<GLfloat> vertex_buffer_data;
 
 void init_glut(int &argc, char *argv[]);
+
+bool init_glew();
+
+void init_GL();
