@@ -1,2 +1,10 @@
 # OpenGL
-Projet openGL_avance
+Projet openGL avance
+
+to run:
+```
+mkdir build; cd build
+cmake ..
+make
+./pogla
+```
