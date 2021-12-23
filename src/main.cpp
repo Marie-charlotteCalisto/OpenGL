@@ -91,11 +91,17 @@ int main(int argc, char** argv) {
     initGlew();
     glClearColor(0.0f, 0.3f, 0.6f, 0.0f);
 
-    Program *cube_shader = Program::make_program(ROOT_DIR "/vertex_shader.glsl",
-                                        ROOT_DIR "/fragment_shader.glsl",
-                                        ROOT_DIR "/geometry_shader.glsl");
-    Program *sky_shader = Program::make_program(ROOT_DIR "/vertex_sky_shader.glsl",
-                                        ROOT_DIR "/sky_shader.glsl");
+    std::vector<std::pair<GLenum, std::string>> cube_shader_path = {
+        {GL_VERTEX_SHADER, ROOT_DIR "/vertex_shader.glsl"},
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/fragment_shader.glsl"}};
+     //   {GL_GEOMETRY_SHADER, ROOT_DIR "/geometry_shader.glsl"}};
+
+    std::vector<std::pair<GLenum, std::string>> sky_shader_path = {
+        {GL_VERTEX_SHADER, ROOT_DIR "/vertex_sky_shader.glsl"},
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/sky_shader.glsl"}};
+
+    Program *cube_shader = Program::make_program(cube_shader_path);
+    Program *sky_shader = Program::make_program(sky_shader_path);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);

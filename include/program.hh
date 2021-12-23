@@ -9,19 +9,24 @@
 
 #include "ogl.hh"
 
+/*
+enum class SHADER{
+
+    VERTEX= 0,
+    TESS_CONTROL,
+    TESS_EVALUTATION,
+    GEOMETRY,
+    COMPUTE,
+    FRAGMENT
+}
+*/
+
 class Program {
 public:
     Program() = default;
     ~Program() {if (log) free(log);}
 
-    static Program *make_program(std::string vertex_shader_file,
-            std::string fragment_shader_file,
-            std::string geometry_shader_file);
-
-
-    static Program *make_program(std::string vertex_shader_file,
-            std::string fragment_shader_file);
-
+    static Program *make_program(std::vector<std::pair<GLenum, std::string>> shader_paths);
 
     int getID() {return id;}
     char *get_log();
