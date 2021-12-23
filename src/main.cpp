@@ -92,13 +92,13 @@ int main(int argc, char** argv) {
     glClearColor(0.0f, 0.3f, 0.6f, 0.0f);
 
     std::vector<std::pair<GLenum, std::string>> cube_shader_path = {
-        {GL_VERTEX_SHADER, ROOT_DIR "/vertex_shader.glsl"},
-        {GL_FRAGMENT_SHADER, ROOT_DIR "/fragment_shader.glsl"}};
+        {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_shader.glsl"},
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_shader.glsl"}};
      //   {GL_GEOMETRY_SHADER, ROOT_DIR "/geometry_shader.glsl"}};
 
     std::vector<std::pair<GLenum, std::string>> sky_shader_path = {
-        {GL_VERTEX_SHADER, ROOT_DIR "/vertex_sky_shader.glsl"},
-        {GL_FRAGMENT_SHADER, ROOT_DIR "/sky_shader.glsl"}};
+        {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_sky_shader.glsl"},
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/sky_shader.glsl"}};
 
     Program *cube_shader = Program::make_program(cube_shader_path);
     Program *sky_shader = Program::make_program(sky_shader_path);
@@ -186,9 +186,9 @@ int main(int argc, char** argv) {
    unsigned int cubemapTexture = loadCubemap(faces);
 
     std::vector<std::string> cube_textures = {
-        //ROOT_DIR "/rose/Models and Textures/grass_texture225.jpg",
+        ROOT_DIR "/texture/cube.jpg",
     };
-    Model cube(ROOT_DIR "/cube.obj", cube_textures, cube_shader, 4, 0, 0);
+    Model cube(ROOT_DIR "/obj/cube.obj", cube_textures, cube_shader, 4, 0, 0);
     models.push_back(cube);
 
     glfwSetCursorPos(window, 200, 200);
