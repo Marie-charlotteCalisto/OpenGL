@@ -105,7 +105,7 @@ bool init_shaders()
 {
     std::vector<std::pair<GLenum, std::string>> cube_shader_path = {
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex.glsl"},
-        {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry.glsl"},
+        {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_mesh.glsl"},
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment.glsl"}};
 
     std::vector<std::pair<GLenum, std::string>> sky_shader_path = {
