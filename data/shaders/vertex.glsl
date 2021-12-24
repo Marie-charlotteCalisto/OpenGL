@@ -4,28 +4,22 @@ in vec3 position;
 in vec3 normalSmooth;
 
 out vec3 color;
+out vec3 gs_normal;
 
 vec3 light_color = vec3(1.0, 1.0, 1.0);
 vec3 light_position = vec3(-10.0, -10.0, -50.0);
 
 vec3 object_color = vec3(0.0, 1.0, 1.0);
 
-mat4 model_view_matrix = mat4(
-			      0.57735, -0.33333, 0.57735, 0.00000,
-			      0.00000, 0.66667, 0.57735, 0.00000,
-			      -0.57735, -0.33333, 0.57735, 0.00000,
-			      0.00000, 0.00000, -17, 1.00000);
-mat4 projection_matrix = mat4(
-			      15.00000, 0.00000, 0.00000, 0.00000,
-			      0.00000, 15.00000, 0.00000, 0.00000,
-			      0.00000, 0.00000, -1.00020, -1.00000,
-			      0.00000, 0.00000, -10.00100, 0.00000);
+uniform mat4 MVP;
 
 void main() {
 
-  gl_Position = projection_matrix * model_view_matrix * vec4(position, 1.0);
+  gl_Position = MVP * vec4(position, 1.0);
 
   float c = clamp(dot(normalize(position - light_position), normalSmooth), 0.0, 1.0);
   color = object_color * c;
 
+  mat3 normalMatrix = mat3(transpose(inverse(MVP)));
+  gs_normal = normalize(vec3(vec4(normalMatrix * position, 0.0)));
 }

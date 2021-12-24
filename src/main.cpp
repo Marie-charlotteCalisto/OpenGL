@@ -1,10 +1,12 @@
+#include <filesystem>
+
 #include "ogl.hh"
 #include "program.hh"
 #include "objloader.hh"
 #include "mouse.hh"
 #include "model.hh"
 #include "stb_image.h"
-#include <filesystem>
+#include "skybox.hh"
 
 #define ROOT_DIR "../data"
 
@@ -83,89 +85,44 @@ bool initGLFW() {
 }
 
 bool initGlew() {
-    return glewInit() == GLEW_OK;
+    if (glewInit())
+    {
+        std::cerr << "Error while initializing glew" << std::endl;
+        return false;
+    }
+    return true;
 }
 
-int main(int argc, char** argv) {
-    initGLFW();
-    initGlew();
-    glClearColor(0.0f, 0.3f, 0.6f, 0.0f);
+void init_GL() {
+    glEnable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glClearColor(0.4,0.4,0.4,1.0);
+}
 
+bool init_shaders()
+{
     std::vector<std::pair<GLenum, std::string>> cube_shader_path = {
-        {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_shader.glsl"},
-        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_shader.glsl"}};
-     //   {GL_GEOMETRY_SHADER, ROOT_DIR "/geometry_shader.glsl"}};
+        {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex.glsl"},
+        {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry.glsl"},
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment.glsl"}};
 
     std::vector<std::pair<GLenum, std::string>> sky_shader_path = {
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_sky_shader.glsl"},
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/sky_shader.glsl"}};
 
+    glm::mat4 projection = getProjectionMatrix();
     Program *cube_shader = Program::make_program(cube_shader_path);
     Program *sky_shader = Program::make_program(sky_shader_path);
-
-    // Enable depth test
-    glEnable(GL_DEPTH_TEST);
-    // Accept fragment if it closer to the camera than the former one
-    glDepthFunc(GL_LESS);
-    // Cull triangles which normal is not towards the camera
-    glEnable(GL_CULL_FACE);
-
-    glm::mat4 projection = getProjectionMatrix();
-
 
     cube_shader->use();
     cube_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
 
     sky_shader->use();
-    //sky_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
-
-    float skyboxVertices[] = {
-        // positions
-        -1.0f,  1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-        -1.0f,  1.0f, -1.0f,
-        1.0f,  1.0f, -1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-        1.0f, -1.0f,  1.0f
-    };
-
 
     unsigned int skyboxVAO, skyboxVBO;
+
     glGenVertexArrays(1, &skyboxVAO);
     glGenBuffers(1, &skyboxVBO);
     glBindVertexArray(skyboxVAO);
@@ -183,7 +140,7 @@ int main(int argc, char** argv) {
         ROOT_DIR "/skybox/front.jpg",
         ROOT_DIR "/skybox/back.jpg",
     };
-   unsigned int cubemapTexture = loadCubemap(faces);
+    unsigned int cubemapTexture = loadCubemap(faces);
 
     std::vector<std::string> cube_textures = {
         ROOT_DIR "/texture/cube.jpg",
@@ -199,8 +156,6 @@ int main(int argc, char** argv) {
     {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        //display_anim(projection, i);
         display(projection);
 
         // draw skybox as last
@@ -210,6 +165,7 @@ int main(int argc, char** argv) {
         glm::mat4 transform = glm::scale(glm::mat4(1.f), glm::vec3(1.0f));
         glm::mat4 mvp = projection * view * transform;
         sky_shader->setUniformMatrix4fv("MVP", 1, GL_FALSE, &mvp[0][0]);
+        cube_shader->setUniformMatrix4fv("MVP", 1, GL_FALSE, &mvp[0][0]);
 
 
         // skybox cube
@@ -228,5 +184,16 @@ int main(int argc, char** argv) {
     }
 
     glfwTerminate();
+    return true;
+
+}
+
+int main(int argc, char** argv) {
+    initGLFW();
+    if (!initGlew())
+        std::exit(-1);
+    init_GL();
+
+    init_shaders();
     return 0;
 }

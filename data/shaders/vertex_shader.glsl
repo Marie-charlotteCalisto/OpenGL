@@ -12,7 +12,7 @@ out vec3 normal;
 out vec2 uvCoord;
 
 void main() {
-    gl_Position = MVP * vec4(vPosition, 1);
+    gl_Position = MVP * vec4(vPosition, 1.0);
     lightFactor = dot(normalize(lightPosition - vPosition), normalize(vNormal));
     normal = vNormal;
     uvCoord = vUVCoord;
