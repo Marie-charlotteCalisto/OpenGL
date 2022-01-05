@@ -36,8 +36,12 @@ public:
     void setUniformMatrix4fv(const char *name, GLsizei count,
                                       GLboolean transpose,
                                       const GLfloat *value);
+    bool is_triangles() {return is_triangle; };
 
 private:
+
+    void set_is_triangles(bool is_triangle_) { is_triangle = is_triangle_; };
+    bool is_triangle = true;
     char *log = nullptr;
     int id;
 };

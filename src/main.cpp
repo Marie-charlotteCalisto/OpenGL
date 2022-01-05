@@ -113,16 +113,28 @@ void display_anim(glm::mat4 projection, int frame) {
 bool init_shaders()
 {
     std::vector<std::pair<GLenum, std::string>> plane_shader_path = {
+        {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_nothing.glsl"},
+        {GL_TESS_CONTROL_SHADER, ROOT_DIR "/shaders/tesselation_control.glsl"},
+        {GL_TESS_EVALUATION_SHADER, ROOT_DIR "/shaders/tesselation_eval.glsl"},
+        //{GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_mesh.glsl"},
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment.glsl"}};
+
+    std::vector<std::pair<GLenum, std::string>> cube_shader_path = {
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex.glsl"},
         {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_mesh.glsl"},
-        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment.glsl"}};
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_color.glsl"}};
+
 
     std::vector<std::pair<GLenum, std::string>> sky_shader_path = {
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_sky_shader.glsl"},
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/sky_shader.glsl"}};
 
+    Program *plane_shader = Program::make_program(plane_shader_path);
     Program *cube_shader = Program::make_program(cube_shader_path);
     Program *sky_shader = Program::make_program(sky_shader_path);
+
+    plane_shader->use();
+    plane_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
 
     cube_shader->use();
     cube_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
@@ -141,10 +153,13 @@ bool init_shaders()
 
     unsigned int cubemapTexture = loadCubemap(faces);
 
-    std::vector<std::string> plane_textures = {
+    std::vector<std::string> cube_textures = {
         ROOT_DIR "/texture/cube.jpg",
     };
-    Model cube(ROOT_DIR "/obj/plane.obj", plane_textures, plane_shader, 1, 0, 0);
+    Model plane(ROOT_DIR "/obj/plane.obj", cube_textures, plane_shader, 1, 0, 0);
+    models.push_back(plane);
+
+    Model cube(ROOT_DIR "/obj/cube.obj", cube_textures, cube_shader, 1, 0, 0);
     models.push_back(cube);
 
     glfwSetCursorPos(window, 200, 200);
@@ -166,9 +181,6 @@ bool init_shaders()
         glm::mat4 transform = glm::scale(glm::mat4(1.f), glm::vec3(1.0f));
         glm::mat4 mvp = projection * view * transform;
         sky_shader->setUniformMatrix4fv("MVP", 1, GL_FALSE, &mvp[0][0]);
-
-        cube_shader->setUniformMatrix4fv("MVP", 1, GL_FALSE, &mvp[0][0]);
-
         // skybox cube
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
@@ -188,11 +200,29 @@ bool init_shaders()
 
 }
 
+void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
+    GLsizei length, const GLchar* message, const void* userParam)
+{
+    (void) source;
+    (void) id;
+    (void) length;
+    (void) userParam;
+
+    if (type == GL_DEBUG_TYPE_ERROR)
+        std::cerr << "** GL_ERROR **" << " type = 0x" << type\
+            << " severity = 1x" << severity\
+            << ", message = " << message << std::endl;
+}
+
+
+
 int main(int argc, char** argv) {
     initGLFW();
     if (!initGlew())
         std::exit(-1);
     init_GL();
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(MessageCallback, nullptr);
     init_shaders();
     return 0;
 }

@@ -6,6 +6,10 @@
 #include "stb_image.h"
 #endif
 
+
+
+
+
 Texture::Texture(const char *path) {
         int width, height, nrChannels;
        // unsigned int textureID;
@@ -47,6 +51,7 @@ void Mesh::setup(GLuint vao) {
     glGenBuffers(1, &vbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vbuffer);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -69,10 +74,25 @@ void Mesh::setup(GLuint vao) {
     this->vao = vao;
 }
 
-void Mesh::draw() const {
+void Mesh::draw(bool is_triangles) const
+{
+    if (is_triangles)
+        draw_triangles();
+    else
+        draw_patch();
+}
+
+void Mesh::draw_triangles() const {
     glBindTexture(GL_TEXTURE_2D, texture.textureID);
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    glBindVertexArray(0);
+}
+void Mesh::draw_patch() const {
+    glBindTexture(GL_TEXTURE_2D, texture.textureID);
+    glBindVertexArray(vao);
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
+    glDrawArrays(GL_PATCHES, 0, 4);
     glBindVertexArray(0);
 }
 

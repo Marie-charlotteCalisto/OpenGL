@@ -25,9 +25,11 @@ struct Mesh {
     }
 
     void setup(GLuint vao);
-    void draw() const;
+    void draw(bool is_triangles) const;
     void setTexture(Texture text);
 
 private:
+    void draw_triangles() const;
+    void draw_patch() const;
     GLuint vao;
 };

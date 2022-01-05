@@ -8,8 +8,7 @@ void Model::Draw(glm::mat4 projection, glm::mat4 view, GLuint matID)
     shader->setUniformMatrix4fv("MVP", 1, GL_FALSE, &mvp[0][0]);
 
     for(unsigned int i = 0; i < meshes.size(); i++)
-        meshes[i].draw();
-
+        meshes[i].draw(shader->is_triangles());
 }
 void Model::loadModel(const char *path, std::vector<std::string> texture_path)
 {

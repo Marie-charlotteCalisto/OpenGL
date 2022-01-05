@@ -57,8 +57,8 @@ bool compile_shader(const char *ShaderCode, GLuint ShaderID)
     return check_shaders(ShaderID);
 }
 
-bool shaders(std::vector<std::pair<GLenum, std::string>> &shader_paths,
-        GLuint ProgramID, std::vector<GLuint> &shaderID)
+bool create_shaders(std::vector<std::pair<GLenum, std::string>> &shader_paths,
+        GLuint ProgramID, std::vector<GLuint> &shaderID, bool &is_triangle)
 {
     for (std::pair<GLenum, std::string> shader : shader_paths)
     {
@@ -78,6 +78,12 @@ bool shaders(std::vector<std::pair<GLenum, std::string>> &shader_paths,
         glAttachShader(ProgramID, ShaderID);
 
         shaderID.emplace_back(ShaderID);
+
+        if (type == GL_TESS_CONTROL_SHADER)
+        {
+            is_triangle = false;
+            std::cout << " coucou " << std::endl;
+        }
     }
     return true;
 }
@@ -88,8 +94,10 @@ Program *Program::make_program(std::vector<std::pair<GLenum, std::string>> shade
     GLuint ProgramID = glCreateProgram();
 
     std::vector<GLuint> shaderID;
-    if (!shaders(shader_paths, ProgramID, shaderID))
+    bool triangle = true;;
+    if (!create_shaders(shader_paths, ProgramID, shaderID, triangle))
         return nullptr;
+    std::cout << triangle << std::endl;
 
     printf("Linking program\n");
     glLinkProgram(ProgramID);
@@ -105,7 +113,7 @@ Program *Program::make_program(std::vector<std::pair<GLenum, std::string>> shade
 
     Program *p = new Program();
     p->id = ProgramID;
-
+    p->set_is_triangles(triangle);
     return p;
 }
 
