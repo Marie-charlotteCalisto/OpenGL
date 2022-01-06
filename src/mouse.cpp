@@ -50,7 +50,6 @@ glm::mat4 getViewMatrix(GLFWwindow *win) {
     if (glfwGetKey(win, GLFW_KEY_LEFT) == GLFW_PRESS){
         position -= right;
     }
-
     return glm::lookAt(position, position + direction, up);
 
 }

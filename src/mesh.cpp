@@ -91,8 +91,10 @@ void Mesh::draw_triangles() const {
 void Mesh::draw_patch() const {
     glBindTexture(GL_TEXTURE_2D, texture.textureID);
     glBindVertexArray(vao);
-    glPatchParameteri(GL_PATCH_VERTICES, 4);
-    glDrawArrays(GL_PATCHES, 0, 4);
+
+    int nb_patches = 4;
+    glPatchParameteri(GL_PATCH_VERTICES, nb_patches);
+    glDrawArrays(GL_PATCHES, 0, nb_patches);
     glBindVertexArray(0);
 }
 

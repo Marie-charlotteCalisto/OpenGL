@@ -80,10 +80,7 @@ bool create_shaders(std::vector<std::pair<GLenum, std::string>> &shader_paths,
         shaderID.emplace_back(ShaderID);
 
         if (type == GL_TESS_CONTROL_SHADER)
-        {
             is_triangle = false;
-            std::cout << " coucou " << std::endl;
-        }
     }
     return true;
 }
@@ -97,7 +94,6 @@ Program *Program::make_program(std::vector<std::pair<GLenum, std::string>> shade
     bool triangle = true;;
     if (!create_shaders(shader_paths, ProgramID, shaderID, triangle))
         return nullptr;
-    std::cout << triangle << std::endl;
 
     printf("Linking program\n");
     glLinkProgram(ProgramID);

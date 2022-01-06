@@ -1,9 +1,9 @@
 #version 450
 
-in vec3 color;
 
+vec3 object_color = vec3(0.0, 1.0, 1.0);
 layout(location=0) out vec4 output_color;
 
 void main() {
-  output_color = vec4(color, 1.0);
+  output_color = vec4(object_color, 1.0);
 }

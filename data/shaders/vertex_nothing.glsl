@@ -1,6 +1,6 @@
 #version 450
 
-layout(location = 1) in vec3 positon;
+layout(location = 0) in vec3 position;
 
 void main()
 {

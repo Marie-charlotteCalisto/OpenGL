@@ -13,6 +13,7 @@ GLFWwindow *window;
 
 std::vector<Model> models;
 std::vector<Model> models_anim;
+glm::mat4 projection;
 GLuint matID;
 int width = 1024;
 int height =768;
@@ -110,14 +111,45 @@ void display_anim(glm::mat4 projection, int frame) {
     models_anim[frame].Draw(projection, view, matID);
     std::cout << frame << std::endl;
 }
+void init_skybox_buffer(unsigned int &skyboxVAO, unsigned int &skyboxVBO)
+{
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+}
+
+void draw_sky(Program *sky_shader, unsigned int skyboxVAO, unsigned int cubemapTexture)
+{
+        // draw skybox as last
+        sky_shader->use();
+        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+        glm::mat4 view = glm::mat4(glm::mat3(getViewMatrix(window)));
+        glm::mat4 transform = glm::scale(glm::mat4(1.f), glm::vec3(1.0f));
+        glm::mat4 mvp = projection * view * transform;
+        sky_shader->setUniformMatrix4fv("MVP", 1, GL_FALSE, &mvp[0][0]);
+        // skybox cube
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glBindVertexArray(skyboxVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS); // set depth function back to default
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+}
 bool init_shaders()
 {
     std::vector<std::pair<GLenum, std::string>> plane_shader_path = {
+
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_nothing.glsl"},
         {GL_TESS_CONTROL_SHADER, ROOT_DIR "/shaders/tesselation_control.glsl"},
         {GL_TESS_EVALUATION_SHADER, ROOT_DIR "/shaders/tesselation_eval.glsl"},
-        //{GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_mesh.glsl"},
-        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment.glsl"}};
+        {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_mesh.glsl"},
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_color.glsl"}};
 
     std::vector<std::pair<GLenum, std::string>> cube_shader_path = {
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex.glsl"},
@@ -142,21 +174,15 @@ bool init_shaders()
     sky_shader->use();
 
     unsigned int skyboxVAO, skyboxVBO;
+    init_skybox_buffer(skyboxVAO, skyboxVBO);
 
-    glGenVertexArrays(1, &skyboxVAO);
-    glGenBuffers(1, &skyboxVBO);
-    glBindVertexArray(skyboxVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
     unsigned int cubemapTexture = loadCubemap(faces);
 
     std::vector<std::string> cube_textures = {
         ROOT_DIR "/texture/cube.jpg",
     };
-    Model plane(ROOT_DIR "/obj/plane.obj", cube_textures, plane_shader, 1, 0, 0);
+    Model plane(ROOT_DIR "/obj/plane.obj", {}, plane_shader, 1, 0, 0);
     models.push_back(plane);
 
     Model cube(ROOT_DIR "/obj/cube.obj", cube_textures, cube_shader, 1, 0, 0);
@@ -165,7 +191,7 @@ bool init_shaders()
     glfwSetCursorPos(window, 200, 200);
 
 
-    glm::mat4 projection = getProjectionMatrix();
+    projection = getProjectionMatrix();
     int frame = 0;
     int i = frame;
     while (!glfwWindowShouldClose(window))
@@ -174,22 +200,7 @@ bool init_shaders()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         display(projection);
 
-        // draw skybox as last
-        sky_shader->use();
-        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-        glm::mat4 view = glm::mat4(glm::mat3(getViewMatrix(window)));
-        glm::mat4 transform = glm::scale(glm::mat4(1.f), glm::vec3(1.0f));
-        glm::mat4 mvp = projection * view * transform;
-        sky_shader->setUniformMatrix4fv("MVP", 1, GL_FALSE, &mvp[0][0]);
-        // skybox cube
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        glBindVertexArray(skyboxVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-        glDepthFunc(GL_LESS); // set depth function back to default
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        draw_sky(sky_shader, skyboxVAO, cubemapTexture);
         i--;
         if (i <= 0)
             i = frame;
