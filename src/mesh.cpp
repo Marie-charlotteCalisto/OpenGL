@@ -85,15 +85,16 @@ void Mesh::draw(bool is_triangles) const
 void Mesh::draw_triangles() const {
     glBindTexture(GL_TEXTURE_2D, texture.textureID);
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    glDrawArrays(GL_POINTS, 0, vertices.size());
     glBindVertexArray(0);
 }
 void Mesh::draw_patch() const {
     glBindTexture(GL_TEXTURE_2D, texture.textureID);
     glBindVertexArray(vao);
 
-    int nb_patches = 4;
-    glPatchParameteri(GL_PATCH_VERTICES, nb_patches);
+    int nb_vertices_patches = 3;
+    int nb_patches = vertices.size();
+    glPatchParameteri(GL_PATCH_VERTICES, nb_vertices_patches);
     glDrawArrays(GL_PATCHES, 0, nb_patches);
     glBindVertexArray(0);
 }
