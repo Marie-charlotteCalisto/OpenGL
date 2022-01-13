@@ -1,6 +1,6 @@
 #version 450
 
-layout (triangles, equal_spacing, ccw, point_mode) in;
+layout(triangles, fractional_odd_spacing, ccw, point_mode) in;
 
 uniform mat4 MVP;
 
