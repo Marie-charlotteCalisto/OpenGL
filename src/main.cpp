@@ -147,14 +147,14 @@ bool init_shaders()
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_nothing.glsl"},
         {GL_TESS_CONTROL_SHADER, ROOT_DIR "/shaders/tesselation_control.glsl"},
         {GL_TESS_EVALUATION_SHADER, ROOT_DIR "/shaders/tesselation_eval.glsl"},
-        {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_mesh.glsl"},
+        {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_grass.glsl"},
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_color.glsl"}};
 
     std::vector<std::pair<GLenum, std::string>> cube_shader_path = {
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_nothing.glsl"},
         {GL_TESS_CONTROL_SHADER, ROOT_DIR "/shaders/tesselation_control.glsl"},
         {GL_TESS_EVALUATION_SHADER, ROOT_DIR "/shaders/tesselation_eval.glsl"},
-        {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_mesh.glsl"},
+        {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_grass.glsl"},
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_color.glsl"}};
 
 
