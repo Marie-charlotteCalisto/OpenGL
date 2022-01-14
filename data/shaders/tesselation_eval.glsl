@@ -16,7 +16,12 @@ void main()
     vec4 p = p1 + p2 + p3;
 
     gl_Position = MVP * p;
-    tess_normal = normalize(cross(vec3(p1 - p2), vec3(p1 - p3)));
+
+
+    vec3 A = gl_in[0].gl_Position.xyz - gl_in[1].gl_Position.xyz;
+    vec3 B = gl_in[0].gl_Position.xyz - gl_in[2].gl_Position.xyz;
+
+    tess_normal = normalize(cross(A,B));
 
     float c = clamp(dot(normalize(vec3(p) - light_position), tess_normal), 0.0, 1.0);
     color = vec3(0.3, 1.0, 0.0) * c;
