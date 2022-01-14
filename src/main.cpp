@@ -149,7 +149,7 @@ bool init_shaders()
         {GL_TESS_EVALUATION_SHADER, ROOT_DIR "/shaders/tesselation_eval.glsl"},
         {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_grass.glsl"},
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_color.glsl"}};
-    /*
+
     std::vector<std::pair<GLenum, std::string>> cube_shader_path = {
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex.glsl"},
         {GL_TESS_CONTROL_SHADER, ROOT_DIR "/shaders/tesselation_control.glsl"},
@@ -157,7 +157,6 @@ bool init_shaders()
         {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_grass.glsl"},
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_color.glsl"}};
 
-*/
 
 
 
@@ -166,17 +165,15 @@ bool init_shaders()
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/sky_shader.glsl"}};
 
     Program *plane_shader = Program::make_program(plane_shader_path);
- //   Program *cube_shader = Program::make_program(cube_shader_path);
+    Program *cube_shader = Program::make_program(cube_shader_path);
     Program *sky_shader = Program::make_program(sky_shader_path);
 
     plane_shader->use();
     plane_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
 
-/*
     cube_shader->use();
     cube_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
 
-*/
     sky_shader->use();
 
     unsigned int skyboxVAO, skyboxVBO;
@@ -190,11 +187,10 @@ bool init_shaders()
     };
     Model plane(ROOT_DIR "/obj/plane.obj", {}, plane_shader, 1, 0, 0);
     models.push_back(plane);
-    /*
-    Model cube(ROOT_DIR "/obj/cube.obj", cube_textures, cube_shader, 1, 0, 0);
-    models.push_back(cube);
 
-*/
+    Model cube(ROOT_DIR "/obj/cube.obj", cube_textures, cube_shader, 1, 0, 0);
+//    models.push_back(cube);
+
     glfwSetCursorPos(window, 200, 200);
 
 

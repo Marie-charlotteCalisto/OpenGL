@@ -6,6 +6,7 @@ void Model::Draw(glm::mat4 projection, glm::mat4 view, GLuint matID)
     glm::mat4 mvp = projection * view * transform;
     shader->use();
     shader->setUniformMatrix4fv("MVP", 1, GL_FALSE, &mvp[0][0]);
+    shader->setUniformMatrix4fv("model_view", 1, GL_FALSE, &view[0][0]);
 
     for(unsigned int i = 0; i < meshes.size(); i++)
         meshes[i].draw(shader->is_triangles());
