@@ -6,7 +6,7 @@ in  vec3 vs_normal [];
 patch out vec3 patch_normal;
 
 void main() {
-    float nb_frag = 20;
+    float nb_frag = 50;
     gl_TessLevelOuter[0] = nb_frag;
     gl_TessLevelOuter[1] = nb_frag;
     gl_TessLevelOuter[2] = nb_frag;

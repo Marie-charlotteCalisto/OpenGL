@@ -4,11 +4,14 @@ layout (points) in;
 layout (triangle_strip, max_vertices=3) out;
 
 in vec3 tess_normal[];
-in vec3 color[];
-out vec3 object_color;
+out vec4 object_color;
 
-float grass_scale = 10.0f;
-const vec3 grass_vertices[3] = vec3[3](vec3(0.5f, 0.0f, 0.0f), vec3(-0.5f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+in float TesslightFactor[];
+out float lightFactor;
+
+float grass_scale = 1.0f;
+const vec3 grass_vertices[3] = vec3[3](vec3(0.6f, 0.0f, 0.0f), vec3(-0.6f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+const vec4 grass_color[3] = vec4[3](vec4(0.2, 0.4, 0.05, 1.0),vec4(0.2, 0.4, 0.05, 1.0),vec4(0.2, 0.5, 0.05, 1.0));
 
 uniform mat4 MVP;
 
@@ -78,7 +81,8 @@ void main()
         position = offset * position;
 
         gl_Position = MVP * position;
-        object_color = color[0];
+        lightFactor = TesslightFactor[0];
+        object_color = grass_color[i];
         EmitVertex();
     }
 
