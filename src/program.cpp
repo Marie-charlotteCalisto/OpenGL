@@ -124,10 +124,16 @@ void Program::use()
     glUseProgram(id);
 }
 
+
 void Program::setUniform3f(const char *name, float a, float b, float c)
 {
     GLuint uniID = glGetUniformLocation(id, name);
     glUniform3f(uniID, a, b, c);
+}
+void Program::setUniform1f(const char *name, float a)
+{
+    GLuint uniID = glGetUniformLocation(id, name);
+    glUniform1f(uniID, a);
 }
 
 void Program::setUniformMatrix4fv(const char *name, GLsizei count,

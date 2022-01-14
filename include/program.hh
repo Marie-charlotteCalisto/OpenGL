@@ -32,6 +32,7 @@ public:
     char *get_log();
     bool is_ready();
     void use();
+    void setUniform1f(const char *name, float a);
     void setUniform3f(const char *name, float a, float b, float c);
     void setUniformMatrix4fv(const char *name, GLsizei count,
                                       GLboolean transpose,

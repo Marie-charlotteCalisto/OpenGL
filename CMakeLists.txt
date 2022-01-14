@@ -30,5 +30,5 @@ find_library(GLEW_LIBRARY NAMES GLEW glew32 glew glew32s PATH_SUFFIXES lib64)
 find_package(GLEW REQUIRED)
 find_package(GLFW3 REQUIRED)
 
-set(LIBS glfw GL assimp GLEW)
+set(LIBS glfw GL assimp GLEW SDL2)
 target_link_libraries(${PROJECT_NAME} ${LIBS})

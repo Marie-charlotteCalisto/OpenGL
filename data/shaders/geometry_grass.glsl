@@ -13,18 +13,22 @@ float grass_scale = 1.0f;
 const vec3 grass_vertices[3] = vec3[3](vec3(0.6f, 0.0f, 0.0f), vec3(-0.6f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 const vec4 grass_color[3] = vec4[3](vec4(0.2, 0.4, 0.05, 1.0),vec4(0.2, 0.4, 0.05, 1.0),vec4(0.2, 0.5, 0.05, 1.0));
 
+float amplitude = 1.0f;
+float frequency = 0.25f;
+uniform float phase;
+
 uniform mat4 MVP;
 
-float rand(vec2 co)
+float rand(vec3 co)
 {
-    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))* co.z) * 43758.5453);
 }
 
 mat4 rotation(float angle, vec3 axis)
 {
 
-    // Specify the rotation transformation matrix:
-    mat4 m = mat4(
+    //rotation transformation matrix:
+    return mat4(
             axis.x*axis.x * (1.0f - cos(angle)) + cos(angle),       // column 1 of row 1
             axis.x*axis.y * (1.0f - cos(angle)) + axis.z * sin(angle), // column 2 of row 1
             axis.x*axis.z * (1.0f - cos(angle)) - axis.y * sin(angle), // column 3 of row 1
@@ -44,8 +48,6 @@ mat4 rotation(float angle, vec3 axis)
             0.0,
             0.0,
             1.0);
-
-    return m;
 }
 
 void main()
@@ -59,7 +61,7 @@ void main()
     scale[0][0] = grass_scale * 0.1f;
     scale[1][1] = grass_scale * 1.25f;
 
-    float random = rand(root_position.xy);
+    float random = rand(root_position.xyz);
     mat4 rotation_y = rotation(radians(random * 360.0f), vec3(0.0f, 1.0f, 0.0f));
     mat4 rotation_x = rotation(radians(random * 30.0f), vec3(1.0f, 0.0f, 0.0f));
 
@@ -67,9 +69,14 @@ void main()
     vec3 up = vec3(0.0f, 1.0f, 0.0f);
     mat4 tangent_matrix = rotation(
             acos(dot(up, normal_component)),
-            cross(up, normal_component) // already normalized
-            );
+            cross(up, normal_component));
 
+
+    vec3 wind_direction = vec3(-1.0f, 0.0f, 0.0f);
+    mat4 wind = rotation(
+            radians((amplitude * sin(frequency * length(root_position.xyz) + phase) + amplitude) * 15.0f * (1.0f - abs(dot(wind_direction, normal_component)))),
+            cross(normal_component, wind_direction)
+            );
 
     for (int i = 0; i < 3; i++) {
         vec4 position = vec4(grass_vertices[i], 1.0f);
@@ -78,6 +85,7 @@ void main()
         position = rotation_x * position;
         position = rotation_y * position;
         position = tangent_matrix * position;
+        position = wind * position;
         position = offset * position;
 
         gl_Position = MVP * position;
