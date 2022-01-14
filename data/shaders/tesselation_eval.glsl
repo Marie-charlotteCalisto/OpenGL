@@ -1,8 +1,12 @@
 #version 450
 
-layout(triangles, fractional_odd_spacing, ccw, point_mode) in;
+layout(triangles, equal_spacing, ccw, point_mode) in;
 
 uniform mat4 MVP;
+vec3 light_position = vec3(-10.0, -10.0, -50.0);
+
+out vec3 tess_normal;
+out vec3 color;
 
 void main()
 {
@@ -12,4 +16,8 @@ void main()
     vec4 p = p1 + p2 + p3;
 
     gl_Position = MVP * p;
+    tess_normal = normalize(cross(vec3(p1 - p2), vec3(p1 - p3)));
+
+    float c = clamp(dot(normalize(vec3(p) - light_position), tess_normal), 0.0, 1.0);
+    color = vec3(0.3, 1.0, 0.0) * c;
 }
