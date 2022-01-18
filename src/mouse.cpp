@@ -3,6 +3,35 @@
 #include "mouse.hh"
 
 glm::vec3 position = glm::vec3(0, 5, -10);
+float nb_frag = 1.0f;
+float wind_power = 1.0f;
+
+float get_wind_power(GLFWwindow *win)
+{
+    if (glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS){
+        wind_power += 0.05f;
+    }
+    if (glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS){
+        wind_power -= 0.05f;
+    }
+    if (glfwGetKey(win, GLFW_KEY_R) == GLFW_PRESS){
+        wind_power = 1;
+    }
+    return wind_power;
+}
+
+
+float get_nb_frag(GLFWwindow *win)
+{
+    if (glfwGetKey(win, GLFW_KEY_P) == GLFW_PRESS){
+        nb_frag += 0.5f;
+    }
+
+    if (glfwGetKey(win, GLFW_KEY_M) == GLFW_PRESS){
+        nb_frag -= 1;
+    }
+    return nb_frag;
+}
 
 glm::mat4 getViewMatrix(GLFWwindow *win) {
 

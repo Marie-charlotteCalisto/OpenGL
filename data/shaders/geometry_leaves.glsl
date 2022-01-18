@@ -1,7 +1,7 @@
 #version 450
 
 layout (points) in;
-layout (triangle_strip, max_vertices=3) out;
+layout (triangle_strip, max_vertices=6) out;
 
 in vec3 tess_normal[];
 out vec4 object_color;
@@ -9,9 +9,26 @@ out vec4 object_color;
 in float TesslightFactor[];
 out float lightFactor;
 
-float grass_scale = 1.0f;
-const vec3 grass_vertices[3] = vec3[3](vec3(0.6f, 0.0f, 0.0f), vec3(-0.6f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-const vec4 grass_color[3] = vec4[3](vec4(0.2, 0.4, 0.05, 1.0),vec4(0.2, 0.4, 0.05, 1.0),vec4(0.2, 0.5, 0.05, 1.0));
+float grass_scale = 0.5f;
+const vec3 grass_vertices[6] = vec3[6](
+        //first triangle
+        vec3(0.0, 0.0f, 0.0f),
+        vec3(0.6f, 0.25f, 0.0f),
+        vec3(-0.6f, 0.25f, 0.0f),
+
+        //segond triangle
+        vec3(0.6f, 0.25f, 0.0f),
+        vec3(-0.6f, 0.25f, 0.0f),
+        vec3(0.0, 0.5f, 0.0f));
+
+const vec4 grass_color[6] = vec4[6](
+        vec4(0.2, 0.4, 0.05, 1.0),
+        vec4(0.2, 0.5, 0.05, 1.0),
+        vec4(0.2, 0.5, 0.05, 1.0),
+
+        vec4(0.2, 0.5, 0.05, 1.0),
+        vec4(0.2, 0.5, 0.05, 1.0),
+        vec4(0.2, 0.6, 0.05, 1.0));
 
 uniform float amplitude = 1.0f;
 float frequency = 0.25f;
@@ -78,7 +95,7 @@ void main()
             cross(normal_component, wind_direction)
             );
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 6; i++) {
         vec4 position = vec4(grass_vertices[i], 1.0f);
 
         position = scale * position;

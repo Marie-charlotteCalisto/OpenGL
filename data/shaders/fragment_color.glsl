@@ -5,5 +5,5 @@ in vec4 object_color;
 in float lightFactor;
 
 void main() {
-  output_color = object_color * lightFactor;
+  output_color = object_color;
 }

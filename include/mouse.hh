@@ -2,6 +2,9 @@
 
 #include "ogl.hh"
 
+float get_wind_power(GLFWwindow *win);
+float get_nb_frag(GLFWwindow *win);
+
 glm::mat4 getViewMatrix(GLFWwindow *win);
 
 glm::mat4 getProjectionMatrix();

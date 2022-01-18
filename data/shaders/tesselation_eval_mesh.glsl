@@ -1,6 +1,6 @@
 #version 450
 
-layout(triangles, equal_spacing, ccw, point_mode) in;
+layout(triangles, equal_spacing, ccw) in;
 
 uniform mat4 MVP;
 uniform mat4 model_view;
@@ -27,7 +27,6 @@ float f(float x, float y)
 }
 
 
-
 void main()
 {
     vec4 p1 = gl_in[0].gl_Position * gl_TessCoord.x;
@@ -36,7 +35,8 @@ void main()
     vec4 p = p1 + p2 + p3;
 
     vec4 off = f(p.x*0.05f, p.z*0.05f)*vec4(0.0, 10.0, 0.0, 0.0);;
-    gl_Position = p + off;
+
+    gl_Position = MVP * (p + off);
 
 
     vec3 A = gl_in[0].gl_Position.xyz - gl_in[1].gl_Position.xyz;

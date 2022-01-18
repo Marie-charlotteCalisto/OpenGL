@@ -25,21 +25,22 @@ public:
     Model(const char *path,
             std::vector<std::string> texture_path,
             Program *_shader,
-            float s, float xoff, float yoff)
+            float s, float xoff, float yoff, float zoff)
     {
         loadModel(path, texture_path);
         scale = s;
         xo = xoff;
         yo = yoff;
+        zo = zoff;
         shader = _shader;
     }
 
-void Draw(glm::mat4 projection, glm::mat4 view, GLuint matID);
+void Draw(glm::mat4 projection, glm::mat4 view, float nb_frag, float wind_power, GLuint matID);
     // draws the model, and thus all its meshes
 
 
 private:
-    float scale, xo, yo;
+    float scale, xo, yo, zo;
     Program *shader;
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(const char *path, std::vector<std::string> texture_path);

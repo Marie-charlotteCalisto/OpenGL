@@ -101,14 +101,17 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 
 void display(glm::mat4 projection) {
     glm::mat4 view = getViewMatrix(window);
+    float nb_frag = get_nb_frag(window);
+    float wind_power = get_wind_power(window);
     for (auto model: models) {
-        model.Draw(projection, view, matID);
+        model.Draw(projection, view, nb_frag, wind_power, matID);
     }
 }
 void display_anim(glm::mat4 projection, int frame) {
 
     glm::mat4 view = getViewMatrix(window);
-    models_anim[frame].Draw(projection, view, matID);
+    float nb_frag = get_nb_frag(window);
+    models_anim[frame].Draw(projection, view, nb_frag, 1, matID);
     std::cout << frame << std::endl;
 }
 void init_skybox_buffer(unsigned int &skyboxVAO, unsigned int &skyboxVBO)
@@ -143,33 +146,71 @@ void draw_sky(Program *sky_shader, unsigned int skyboxVAO, unsigned int cubemapT
 }
 bool init_shaders()
 {
-    std::vector<std::pair<GLenum, std::string>> plane_shader_path = {
+    std::vector<std::pair<GLenum, std::string>> grass_shader_path = {
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex.glsl"},
         {GL_TESS_CONTROL_SHADER, ROOT_DIR "/shaders/tesselation_control.glsl"},
         {GL_TESS_EVALUATION_SHADER, ROOT_DIR "/shaders/tesselation_eval.glsl"},
         {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_grass.glsl"},
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_color.glsl"}};
 
-    std::vector<std::pair<GLenum, std::string>> ground_shader_path = {
-        {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_shader.glsl"},
+    std::vector<std::pair<GLenum, std::string>> leaves_shader_path = {
+        {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex.glsl"},
+        {GL_TESS_CONTROL_SHADER, ROOT_DIR "/shaders/tesselation_control_leaves.glsl"},
+        {GL_TESS_EVALUATION_SHADER, ROOT_DIR "/shaders/tesselation_eval_leaves.glsl"},
+        {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_leaves.glsl"},
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_color.glsl"}};
 
 
+    std::vector<std::pair<GLenum, std::string>> mesh_shader_path = {
+        {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex.glsl"},
+        {GL_TESS_CONTROL_SHADER, ROOT_DIR "/shaders/tesselation_control.glsl"},
+        {GL_TESS_EVALUATION_SHADER, ROOT_DIR "/shaders/tesselation_eval_mesh.glsl"},
+        {GL_GEOMETRY_SHADER, ROOT_DIR "/shaders/geometry_mesh.glsl"},
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment_color.glsl"}};
 
+
+    std::vector<std::pair<GLenum, std::string>> color_shader_path = {
+        {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex.glsl"},
+        {GL_TESS_CONTROL_SHADER, ROOT_DIR "/shaders/tesselation_control.glsl"},
+        {GL_TESS_EVALUATION_SHADER, ROOT_DIR "/shaders/tesselation_eval_mesh.glsl"},
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment.glsl"}};
+
+
+
+    std::vector<std::pair<GLenum, std::string>> trunc_shader_path = {
+        {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex.glsl"},
+        {GL_TESS_CONTROL_SHADER, ROOT_DIR "/shaders/tesselation_control.glsl"},
+        {GL_TESS_EVALUATION_SHADER, ROOT_DIR "/shaders/tesselation_eval_trunc.glsl"},
+        {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/fragment.glsl"}};
 
     std::vector<std::pair<GLenum, std::string>> sky_shader_path = {
         {GL_VERTEX_SHADER, ROOT_DIR "/shaders/vertex_sky_shader.glsl"},
         {GL_FRAGMENT_SHADER, ROOT_DIR "/shaders/sky_shader.glsl"}};
 
-    Program *plane_shader = Program::make_program(plane_shader_path);
-    Program *ground_shader = Program::make_program(ground_shader_path);
+    Program *leaves_shader = Program::make_program(leaves_shader_path);
+    Program *grass_shader = Program::make_program(grass_shader_path);
+    Program *ground_shader = Program::make_program(color_shader_path);
+    Program *mesh_shader = Program::make_program(mesh_shader_path);
+    Program *trunc_shader = Program::make_program(trunc_shader_path);
     Program *sky_shader = Program::make_program(sky_shader_path);
 
-    plane_shader->use();
-    plane_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
+    leaves_shader->use();
+    leaves_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
+
+    mesh_shader->use();
+    mesh_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
+
+    grass_shader->use();
+    grass_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
 
     ground_shader->use();
     ground_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
+    ground_shader->setUniform3f("object_color", 0.2, 0.4, 0.05);
+
+    trunc_shader->use();
+    trunc_shader->setUniform3f("lightPosition", -5.f, 100.f, -40.f);
+    trunc_shader->setUniform3f("object_color", 0.5, 0.2, 0.0);
+
 
     sky_shader->use();
 
@@ -179,14 +220,23 @@ bool init_shaders()
 
     unsigned int cubemapTexture = loadCubemap(faces);
 
-    std::vector<std::string> cube_textures = {
-        ROOT_DIR "/texture/cube.jpg",
-    };
-    Model plane(ROOT_DIR "/obj/plane.obj", {}, plane_shader, 10, 0, 0);
-    models.push_back(plane);
+    Model leaves(ROOT_DIR "/obj/Tree_leaves.obj", {}, leaves_shader, 2, 0, 0, 0);
+    models.push_back(leaves);
 
-    Model ground(ROOT_DIR "/obj/plane.obj", cube_textures, ground_shader, 10, 0, 0);
+    Model trunc(ROOT_DIR "/obj/Tree_trunc.obj", {}, trunc_shader, 2, 0, 0, 0);
+    models.push_back(trunc);
+
+
+    //ground
+    Model grass(ROOT_DIR "/obj/plane.obj", {}, grass_shader, 1, 0, 0, 0);
+    models.push_back(grass);
+
+    Model ground_mesh(ROOT_DIR "/obj/plane.obj", {}, mesh_shader, 1, 0, 0, 0);
+    models.push_back(ground_mesh);
+
+    Model ground(ROOT_DIR "/obj/plane.obj", {}, ground_shader, 1, 0, 0, 0);
     models.push_back(ground);
+
 
     glfwSetCursorPos(window, 200, 200);
 
