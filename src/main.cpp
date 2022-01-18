@@ -15,8 +15,8 @@ std::vector<Model> models;
 std::vector<Model> models_anim;
 glm::mat4 projection;
 GLuint matID;
-int width = 1024;
-int height =768;
+int width = 2048;
+int height =2048;
 
 bool initGlew() {
     if (glewInit())

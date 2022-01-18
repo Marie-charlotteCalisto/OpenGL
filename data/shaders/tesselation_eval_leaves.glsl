@@ -41,10 +41,6 @@ void main()
         off = f(p.x*0.05f, p.z*0.05f)*vec4(0.0, nb_frag, 0.0, 0.0);
     gl_Position = p + vec4(0.0, clamp(off.y, 0.0, 4.9), 0.0, 0.0);
 
-
-    vec3 A = gl_in[0].gl_Position.xyz - gl_in[1].gl_Position.xyz;
-    vec3 B = gl_in[0].gl_Position.xyz - gl_in[2].gl_Position.xyz;
-
     tess_normal = patch_normal;
 
     TesslightFactor = dot(normalize(lightPosition - p.xyz), normalize(tess_normal));
