@@ -11,7 +11,7 @@ make
 ./pogla
 ```
 
-##Command when running:
+## Command when running:
 
 mouvement of camera: key arrows and mouse
 
@@ -22,7 +22,7 @@ augmentation of wind power : "w"
 diminution of wind power : "s"
 
 
-##To add model and shader pipeline:
+## To add model and shader pipeline:
 In init\_shaders() : main.cpp
 
 ```
@@ -51,7 +51,7 @@ In init\_shaders() : main.cpp
 ```
 
 
-##To watch mesh geometry shader:
+## To watch mesh geometry shader:
 remove "ground" model in init\_shaders() : main.cpp
 ```
     models.push_back(ground);
