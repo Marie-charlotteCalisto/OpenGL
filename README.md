@@ -1,7 +1,7 @@
 # OpenGL
 Projet openGL avance
 
-[![Watch the video]]( https://youtu.be/366bbG41iAc)
+![Watch the video]( https://youtu.be/366bbG41iAc)
 ![](https://img.youtube.com/vi/366bbG41iAc/maxresdefault.jpg)
 
 ##To run and compile:
